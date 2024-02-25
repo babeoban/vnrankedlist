@@ -25,15 +25,27 @@ th:nth-child(1), td:nth-child(1) {
 }
 
 th:nth-child(2), td:nth-child(2) {
-  width: 400px;
+  width: 300px;
+}
+
+th:nth-child(3):hover {
+  cursor: pointer;
+  background-color: #14868a;
+}
+
+th:nth-child(4):hover {
+  cursor: pointer;
+  background-color: #14868a;
 }
 
 th:nth-child(3), td:nth-child(3) {
-  width: 90px;
+  width: 50px;
+  text-align: center;
 }
 
 th:nth-child(4), td:nth-child(4) {
   width: 90px;
+  text-align: center;
 }
 
 th:nth-child(5), td:nth-child(5) {
