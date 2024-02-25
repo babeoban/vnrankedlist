@@ -85,15 +85,8 @@ function displayPlayerData() {
         // Attach click event listener to each row
         row.addEventListener('click', function(event) {
             // Construct profile URL and open in new tab for left/middle click
-            if (event.button === 1 || event.ctrlKey || event.metaKey) {
                 const profileUrl = `https://mcsrranked.com/profile/${userData.nickname}`;
                 window.open(profileUrl, '_blank');
-            } else {
-                // For right-click, prevent default context menu and open in same tab
-                event.preventDefault();
-                const profileUrl = `https://mcsrranked.com/profile/${userData.nickname}`;
-                window.location.href = profileUrl;
-            }
         });
 
         // Add CSS class to the row for styling
