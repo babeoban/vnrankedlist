@@ -53,36 +53,6 @@ function sortPlayerData() {
     }
 }
 
-function displayPlayerData() {
-    const rankedBody = document.getElementById('rankedBody');
-    rankedBody.innerHTML = ''; // Clear table body
-
-    playerData.forEach((userData, index) => {
-        const row = rankedBody.insertRow();
-        const rankCell = row.insertCell(0);
-        rankCell.textContent = index + 1;
-        const nameCell = row.insertCell(1);
-        nameCell.textContent = userData.nickname;
-        const eloCell = row.insertCell(2);
-        eloCell.textContent = userData.eloRate;
-        const bestTimeCell = row.insertCell(3);
-        bestTimeCell.textContent = userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-';
-        const winRate = (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 || 0; // Calculate win rate
-        const winRateCell = row.insertCell(4);
-        winRateCell.textContent = winRate.toFixed(2) + "%"; // Display win rate with 2 decimal places
-
-        // Attach click event listener to each row
-        row.addEventListener('click', function(event) {
-            // Construct profile URL and open in new tab for left/middle click
-            const profileUrl = `https://mcsrranked.com/profile/${userData.nickname}`;
-            window.open(profileUrl, '_blank');
-        });
-
-        // Add CSS class to the row for styling
-        row.classList.add('player-row');
-    });
-}
-
 // Function to format time in mm:ss.xxx format
 function formatTime(timeInMs) {
     const minutes = Math.floor(timeInMs / (60 * 1000));
@@ -120,3 +90,53 @@ fetchDataForUUIDs();
 setInterval(function() {
     fetchDataForUUIDs(); // Fetch new data
 }, 180000);
+
+function displayPlayerData() {
+    const rankedBody = document.getElementById('rankedBody');
+    rankedBody.innerHTML = ''; // Clear table body
+
+    playerData.forEach((userData, index) => {
+        const row = rankedBody.insertRow();
+        const rankCell = row.insertCell(0);
+        rankCell.textContent = index + 1;
+        rankCell.style.textAlign = 'center'; // Align text to center
+        const nameCell = row.insertCell(1);
+        nameCell.textContent = userData.nickname;
+        nameCell.style.textAlign = 'center'; // Align text to center
+        const eloCell = row.insertCell(2);
+        eloCell.textContent = userData.eloRate;
+        eloCell.style.textAlign = 'center'; // Align text to center
+        const bestTimeCell = row.insertCell(3);
+        bestTimeCell.textContent = userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-';
+        bestTimeCell.style.textAlign = 'center'; // Align text to center
+        const winRate = (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 || 0; // Calculate win rate
+        const winRateCell = row.insertCell(4);
+        winRateCell.textContent = winRate.toFixed(2) + "%"; // Display win rate with 2 decimal places
+        winRateCell.style.textAlign = 'center'; // Align text to center
+
+        // Set text color based on elo rate
+        if (userData.eloRate >= 2000) {
+            eloCell.style.color = 'purple';
+        } else if (userData.eloRate >= 1500 && userData.eloRate <= 1999) {
+            eloCell.style.color = 'cyan';
+        } else if (userData.eloRate >= 1200 && userData.eloRate <= 1499) {
+            eloCell.style.color = 'lime';
+        } else if (userData.eloRate >= 900 && userData.eloRate <= 1199) {
+            eloCell.style.color = 'gold';
+        } else if (userData.eloRate >= 600 && userData.eloRate <= 899) {
+            eloCell.style.color = 'silver';
+        } else {
+            eloCell.style.color = 'black'; // Default color
+        }
+
+        // Attach click event listener to each row
+        row.addEventListener('click', function(event) {
+            // Construct profile URL and open in new tab for left/middle click
+            const profileUrl = `https://mcsrranked.com/profile/${userData.nickname}`;
+            window.open(profileUrl, '_blank');
+        });
+
+        // Add CSS class to the row for styling
+        row.classList.add('player-row');
+    });
+}
