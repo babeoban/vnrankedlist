@@ -99,16 +99,40 @@ function displayPlayerData() {
         const row = rankedBody.insertRow();
         const rankCell = row.insertCell(0);
         rankCell.textContent = index + 1;
-        rankCell.style.textAlign = 'center'; // Align text to center
+        rankCell.style.textAlign = 'center';
         const nameCell = row.insertCell(1);
-        nameCell.textContent = userData.nickname;
-        nameCell.style.textAlign = 'center'; // Align text to center
+        nameCell.style.textAlign = 'left';
+        
+        // Create a container for the profile picture and name
+        const profileNameContainer = document.createElement('div');
+        profileNameContainer.style.display = 'inline-block'; // Make the container inline-block
+
+        const profilePic = document.createElement('img');
+        profilePic.src = `https://crafatar.com/avatars/${userData.uuid}`;
+        profilePic.width = 16; 
+        profilePic.height = 16; 
+        profilePic.alt = 'Profile Picture'; 
+        profilePic.style.marginRight = '4px'; 
+
+        // Create the player's name element
+        const playerName = document.createElement('span');
+        playerName.textContent = userData.nickname;
+
+        // Append the profile picture and name to the container
+        profileNameContainer.appendChild(profilePic);
+        profileNameContainer.appendChild(playerName);
+
+        // Append the container to the name cell
+        nameCell.appendChild(profileNameContainer);
+
         const eloCell = row.insertCell(2);
         eloCell.textContent = userData.eloRate;
         eloCell.style.textAlign = 'center'; // Align text to center
+
         const bestTimeCell = row.insertCell(3);
         bestTimeCell.textContent = userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-';
         bestTimeCell.style.textAlign = 'center'; // Align text to center
+
         const winRate = (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 || 0; // Calculate win rate
         const winRateCell = row.insertCell(4);
         winRateCell.textContent = winRate.toFixed(2) + "%"; // Display win rate with 2 decimal places
