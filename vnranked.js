@@ -156,7 +156,7 @@ function displayPlayerData() {
         // Attach click event listener to each row
         row.addEventListener('click', function(event) {
             // Construct profile URL and open in new tab for left/middle click
-            const profileUrl = `https://mcsrranked.com/profile/${userData.nickname}`;
+            const profileUrl = `https://mcsrrankedtracker.vercel.app/users/${userData.nickname}`;
             window.open(profileUrl, '_blank');
         });
 
