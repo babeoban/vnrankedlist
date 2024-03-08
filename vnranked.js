@@ -108,7 +108,7 @@ function displayPlayerData() {
         profileNameContainer.style.display = 'inline-block'; // Make the container inline-block
 
         const profilePic = document.createElement('img');
-        profilePic.src = `https://crafatar.com/avatars/${userData.uuid}`;
+        profilePic.src = `https://mc-heads.net/head/${userData.uuid}`;
         profilePic.width = 16; 
         profilePic.height = 16; 
         profilePic.alt = 'Profile Picture'; 
