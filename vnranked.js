@@ -1,5 +1,5 @@
 let playerData = []; // Array to store fetched player data
-let sortByElo = true; // Flag to track sorting type
+let sortT = 1; // Flag to track sorting type
 
 async function fetchUUIDs() {
     try {
@@ -13,9 +13,9 @@ async function fetchUUIDs() {
 }
 
 async function fetchDataForUUIDs() {
-    playerData = []; 
+    playerData = [];
     try {
-        const uuids = await fetchUUIDs(); // Fetch UUID list
+        const uuids = await fetchUUIDs();
         for (const uuid of uuids) {
             const apiUrl = `https://mcsrranked.com/api/users/${uuid}`;
             const userDataResponse = await fetch(apiUrl);
@@ -24,23 +24,24 @@ async function fetchDataForUUIDs() {
             const bestTimeRanked = userData.data.statistics.season.bestTime.ranked;
             const winsRanked = userData.data.statistics.season.wins.ranked;
             const losesRanked = userData.data.statistics.season.loses.ranked;
+            const forfeitsRanked = userData.data.statistics.season.forfeits.ranked;
+            const playedMatchesRanked = userData.data.statistics.season.playedMatches.ranked;
 
-            if (eloRate !== null && eloRate !== "null") {
-                playerData.push({ uuid, nickname: userData.data.nickname, eloRate, bestTimeRanked, winsRanked, losesRanked });
+            if (eloRate !== null && eloRate !== "null" && playedMatchesRanked !== 0) {
+                const ffRate = (forfeitsRanked / playedMatchesRanked) * 100; // Calculate FF rate
+                playerData.push({ uuid, nickname: userData.data.nickname, eloRate, bestTimeRanked, winsRanked, losesRanked, ffRate });
             }
         }
 
-        sortPlayerData(); // Sort the player data
-        displayPlayerData(); // Display the sorted player data
+        sortPlayerData();
+        displayPlayerData();
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 }
 
-
-// Function to sort player data based on sorting type
 function sortPlayerData() {
-    if (sortByElo) {
+    if (sortT == 1) {
         playerData.sort((a, b) => b.eloRate - a.eloRate);
     } else {
         playerData.sort((a, b) => {
@@ -61,25 +62,20 @@ function formatTime(timeInMs) {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
 }
 
-// Function to toggle sort type when table header is clicked
-function toggleSortType() {
-    sortByElo = !sortByElo; // Toggle the sort type
-    sortPlayerData(); // Sort player data based on new sorting type
-    displayPlayerData(); // Display sorted player data
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     const eloHeader = document.querySelector('th:nth-child(3)');
     const bestTimeHeader = document.querySelector('th:nth-child(4)');
+    const ffRateHeader = document.querySelector('th:nth-child(5)');
+    const winRateHeader = document.querySelector('th:nth-child(6)');
 
     eloHeader.addEventListener('click', function() {
-        sortByElo = true;
+        sortT = 1;
         sortPlayerData(); // Sort player data based on Elo Rate
         displayPlayerData(); // Display sorted player data
     });
 
     bestTimeHeader.addEventListener('click', function() {
-        sortByElo = false;
+        sortT = 2;
         sortPlayerData(); // Sort player data based on Best Time
         displayPlayerData(); // Display sorted player data
     });
@@ -93,52 +89,51 @@ setInterval(function() {
 
 function displayPlayerData() {
     const rankedBody = document.getElementById('rankedBody');
-    rankedBody.innerHTML = ''; // Clear table body
+    rankedBody.innerHTML = '';
 
     playerData.forEach((userData, index) => {
         const row = rankedBody.insertRow();
         const rankCell = row.insertCell(0);
         rankCell.textContent = index + 1;
         rankCell.style.textAlign = 'center';
+
         const nameCell = row.insertCell(1);
         nameCell.style.textAlign = 'left';
-        
-        // Create a container for the profile picture and name
         const profileNameContainer = document.createElement('div');
-        profileNameContainer.style.display = 'inline-block'; // Make the container inline-block
+        profileNameContainer.style.display = 'inline-block';
 
         const profilePic = document.createElement('img');
         profilePic.src = `https://mc-heads.net/head/${userData.uuid}`;
-        profilePic.width = 16; 
-        profilePic.height = 16; 
-        profilePic.alt = 'Profile Picture'; 
-        profilePic.style.marginRight = '4px'; 
+        profilePic.width = 16;
+        profilePic.height = 16;
+        profilePic.alt = 'Profile Picture';
+        profilePic.style.marginRight = '4px';
 
-        // Create the player's name element
         const playerName = document.createElement('span');
         playerName.textContent = userData.nickname;
 
-        // Append the profile picture and name to the container
         profileNameContainer.appendChild(profilePic);
         profileNameContainer.appendChild(playerName);
-
-        // Append the container to the name cell
         nameCell.appendChild(profileNameContainer);
 
         const eloCell = row.insertCell(2);
         eloCell.textContent = userData.eloRate;
-        eloCell.style.textAlign = 'center'; // Align text to center
+        eloCell.style.textAlign = 'center';
 
         const bestTimeCell = row.insertCell(3);
         bestTimeCell.textContent = userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-';
-        bestTimeCell.style.textAlign = 'center'; // Align text to center
+        bestTimeCell.style.textAlign = 'center';
 
-        const winRate = (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 || 0; // Calculate win rate
+        const winRate = (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 || 0;
         const winRateCell = row.insertCell(4);
-        winRateCell.textContent = winRate.toFixed(2) + "%"; // Display win rate with 2 decimal places
-        winRateCell.style.textAlign = 'center'; // Align text to center
+        winRateCell.textContent = winRate.toFixed(2) + "%";
+        winRateCell.style.textAlign = 'center';
 
-        // Set text color based on elo rate
+        const ffRate = userData.ffRate.toFixed(2);
+        const ffRateCell = row.insertCell(5); // New column for FF rate
+        ffRateCell.textContent = `${ffRate}%`;
+        ffRateCell.style.textAlign = 'center';
+
         if (userData.eloRate >= 2000) {
             eloCell.style.color = 'purple';
         } else if (userData.eloRate >= 1500 && userData.eloRate <= 1999) {
@@ -150,17 +145,14 @@ function displayPlayerData() {
         } else if (userData.eloRate >= 600 && userData.eloRate <= 899) {
             eloCell.style.color = 'silver';
         } else {
-            eloCell.style.color = 'black'; // Default color
+            eloCell.style.color = 'black';
         }
 
-        // Attach click event listener to each row
-        row.addEventListener('click', function(event) {
-            // Construct profile URL and open in new tab for left/middle click
+        row.addEventListener('click', function (event) {
             const profileUrl = `https://mcsrrankedtracker.vercel.app/users/${userData.nickname}`;
             window.open(profileUrl, '_blank');
         });
 
-        // Add CSS class to the row for styling
         row.classList.add('player-row');
     });
 }
